@@ -24,12 +24,18 @@
             Audio Transcription System
         </h1>
 
-        <div class="text-center mb-6 text-gray-400">
+        <div class="absolute top-4 right-6 text-sm text-gray-400">
             {% if user.is_authenticated %}
                 <span>Welcome, <strong class="text-white">{{ user.username }}</strong></span>
-                <a href="{% url 'logout' %}" class="text-blue-400 hover:text-blue-300 underline">Logout</a>
+                <!-- Endi bu oddiy havola emas, balki formani yuboradigan tugma -->
+                <a href="#" id="logout-link" class="ml-4 text-blue-400 hover:text-blue-300 underline">Logout</a>
             {% endif %}
         </div>
+
+        <!-- Yashirin Logout Formasi -->
+        <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+            {% csrf_token %}
+        </form>
 
         <!-- Statistika Bloki -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
