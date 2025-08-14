@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Transcription</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <style>
+        /* Standart audio pleyerni dark mode'ga moslashtirish uchun kichik stil */
+        audio {
+            filter: invert(1) hue-rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-300 antialiased">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <h1 class="text-4xl font-bold text-center text-white mb-6">
+            Audio Transcription System
+        </h1>
+
+        <!-- Statistika Bloki -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-md text-center">
+                <div class="text-4xl font-extrabold text-blue-400">{{ stats.total }}</div>
+                <div class="text-sm font-medium text-gray-400 uppercase tracking-wider mt-2">Total Audios</div>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg shadow-md text-center">
+                <div class="text-4xl font-extrabold text-green-400">{{ stats.with_transcription }}</div>
+                <div class="text-sm font-medium text-gray-400 uppercase tracking-wider mt-2">With Transcription</div>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg shadow-md text-center">
+                <div class="text-4xl font-extrabold text-red-400">{{ stats.without_transcription }}</div>
+                <div class="text-sm font-medium text-gray-400 uppercase tracking-wider mt-2">Without Transcription</div>
+            </div>
+        </div>
+
+        <!-- Boshqaruv Tugmalari -->
+        <div class="flex justify-center gap-4 mb-8">
+            <button id="upload-btn" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors">
+                Upload Audio
+            </button>
+            <a href="{% url 'export_dataset' %}" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 transition-colors">
+                Export Dataset
+            </a>
+        </div>
+
+        <!-- Filter va Qidiruv Formasi -->
+        <form method="get" action="{% url 'main_view' %}" class="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row items-center gap-4 mb-8">
+            <select name="filter_by" onchange="this.form.submit()" class="px-4 py-2 w-full sm:w-auto bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <option value="all" {% if filter_by == 'all' %}selected{% endif %}>All Audios</option>
+                <option value="with_transcription" {% if filter_by == 'with_transcription' %}selected{% endif %}>With Transcription</option>
+                <option value="without_transcription" {% if filter_by == 'without_transcription' %}selected{% endif %}>Without Transcription</option>
+            </select>
+            <input type="text" name="q" placeholder="Search in transcription..." value="{{ q }}" class="px-4 py-2 flex-grow w-full bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors">Apply</button>
+        </form>
+
+        <!-- Asosiy Jadval -->
+        <div class="overflow-x-auto bg-gray-800 rounded-lg shadow-md">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-400 uppercase bg-gray-700">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 w-2/6">Audio File & Player</th>
+                        <th scope="col" class="px-6 py-3 w-3/6">Transcription Field</th>
+                        <th scope="col" class="px-6 py-3 w-1/6">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for audio in page_obj %}
+                    <tr class="border-b border-gray-700 hover:bg-gray-600/50" data-audio-id="{{ audio.id }}">
+                        <td class="px-6 py-4">
+                            <div class="font-mono text-white mb-2">{{ audio.file_name }}</div>
+                            <audio controls src="{{ audio.audio_file.url }}" class="w-full"></audio>
+                        </td>
+                        <td class="px-6 py-4">
+                            <textarea class="transcription-input w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-blue-500 focus:border-blue-500" rows="3">{{ audio.transcription_text|default_if_none:"" }}</textarea>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2 flex-col">
+                                <button class="save-btn px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors" disabled>Save</button>
+                                <button class="delete-btn px-4 py-2 text-xs font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center py-12 text-gray-500">
+                            No audio files found for your criteria.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sahifalash (Pagination) -->
+        {% if page_obj.has_other_pages %}
+        <nav class="flex justify-center mt-8">
+            <ul class="flex items-center -space-x-px h-10 text-base">
+                {% if page_obj.has_previous %}
+                    <li><a href="?page=1&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-s-lg hover:bg-gray-700 hover:text-white">&laquo;</a></li>
+                    <li><a href="?page={{ page_obj.previous_page_number }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">Prev</a></li>
+                {% endif %}
+                <li><span class="flex items-center justify-center px-4 h-10 text-blue-400 border border-gray-700 bg-gray-700">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                {% if page_obj.has_next %}
+                    <li><a href="?page={{ page_obj.next_page_number }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">Next</a></li>
+                    <li><a href="?page={{ page_obj.paginator.num_pages }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-e-lg hover:bg-gray-700 hover:text-white">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+    
+    <!-- Yashirin yuklash formasi -->
+    <form id="upload-form" action="{% url 'upload_audio' %}" method="post" enctype="multipart/form-data" style="display: none;">
+        {% csrf_token %}
+        <input type="file" id="file-input" name="audio_files" accept=".wav" multiple>
+    </form>
+
+    <script>
+        // JAVASCRIPT ENDI JUDA ODDIY VA FAQAT ASOSIY FUNKSIYALAR UCHUN QOLDI
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Fayl yuklash logikasi ---
+            const uploadBtn = document.getElementById('upload-btn');
+            const fileInput = document.getElementById('file-input');
+            const uploadForm = document.getElementById('upload-form');
+            uploadBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', () => { if (fileInput.files.length > 0) uploadForm.submit(); });
+
+            // --- "Save" tugmasi logikasi ---
+            document.querySelectorAll('.transcription-input').forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.closest('tr').querySelector('.save-btn').disabled = false;
+                });
+            });
+            document.querySelectorAll('.save-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.disabled = true;
+                    fetch("{% url 'save_transcription' %}", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                        body: JSON.stringify({
+                            audio_id: this.closest('tr').dataset.audioId,
+                            transcription: this.closest('tr').querySelector('.transcription-input').value
+                        })
+                    })
+                    .then(res => { if (!res.ok) throw new Error('Server response was not ok.') })
+                    .catch(err => {
+                        console.error('Save Error:', err);
+                        alert('An error occurred while saving.');
+                        this.disabled = false; // Xato bo'lsa, tugmani qayta yoqish
+                    });
+                });
+            });
+
+            // --- "Delete" tugmasi logikasi ---
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const fileName = row.querySelector('.font-mono').textContent.trim();
+                    if (confirm(`Are you sure you want to delete "${fileName}"?`)) {
+                        fetch("{% url 'delete_audio' %}", {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                            body: JSON.stringify({ audio_id: row.dataset.audioId })
+                        })
+                        .then(res => res.ok ? res.json() : Promise.reject(res))
+                        .then(data => {
+                            if (data.status === 'success') {
+                                window.location.reload(); // Statistika yangilanishi uchun to'liq yangilash
+                            } else {
+                                alert('Error deleting file: ' + data.message);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Delete Error:', err);
+                            alert('An unexpected error occurred.');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
