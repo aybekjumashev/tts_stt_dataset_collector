@@ -198,6 +198,14 @@
                     }
                 });
             });
+
+            const logoutLink = document.getElementById('logout-link');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(event) {
+                    event.preventDefault(); // Havolaning standart harakatini to'xtatish
+                    document.getElementById('logout-form').submit(); // Yashirin formani yuborish
+                });
+            }
         });
     </script>
 </body>
