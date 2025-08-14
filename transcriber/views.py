@@ -10,7 +10,9 @@ import zipfile
 import csv 
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def main_view(request):
     """
     Display the main page with filtering, search, pagination, and statistics.
