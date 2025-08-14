@@ -7,7 +7,9 @@ from django.conf.urls.static import static # Import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('transcriber.urls')), # Include the app's URLs
+    path('', include('transcriber.urls')), 
+    # login
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 # Add this line to serve media files in development mode
