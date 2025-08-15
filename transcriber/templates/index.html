@@ -144,7 +144,7 @@
                         </td>
                         <td class="px-6 py-4 text-gray-300">{{ audio.speaker.name }}</td>
                         <td class="px-6 py-4">
-                            <textarea class="transcription-input w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white" rows="3" {% if audio.is_checked %}readonly{% endif %}>{{ audio.transcription_text|default_if_none:"" }}</textarea>
+                            <textarea class="transcription-input w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white" rows="5" {% if audio.is_checked %}readonly{% endif %}>{{ audio.transcription_text|default_if_none:"" }}</textarea>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex gap-2">
