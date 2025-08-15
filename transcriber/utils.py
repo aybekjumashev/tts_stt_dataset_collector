@@ -8,9 +8,9 @@ def split_audio(uploaded_file):
 
     chunks = silence.split_on_silence(
         audio,
-        min_silence_len=300,
-        silence_thresh=audio.dBFS - 30, 
-        keep_silence=300
+        min_silence_len=350,
+        silence_thresh=audio.dBFS - 35, 
+        keep_silence=350
     )
 
     for index, chunk in enumerate(chunks, start=1):
