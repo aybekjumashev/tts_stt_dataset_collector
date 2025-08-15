@@ -12,7 +12,6 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from .utils import split_audio
-import threading
 
 
 
@@ -22,15 +21,20 @@ def main_view(request):
     Display the main page with filtering, search, pagination, and statistics.
     """
     total_audios = AudioTranscription.objects.count()
-    with_transcription_count = AudioTranscription.objects.exclude(Q(transcription_text__isnull=True) | Q(transcription_text__exact='')).count()
+    with_transcription_count = AudioTranscription.objects.filter(is_checked=True).count()
     without_transcription_count = total_audios - with_transcription_count
 
     queryset = AudioTranscription.objects.all().order_by('-created_at')
     speakers = Speaker.objects.all()
 
     filter_by = request.GET.get('filter_by', 'all')
-    if filter_by == 'with_transcription':
+    if filter_by == 'with_transcription_all':
         queryset = queryset.exclude(Q(transcription_text__isnull=True) | Q(transcription_text__exact=''))
+    elif filter_by == 'with_transcription_checked':
+        queryset = queryset.filter(is_checked=True)
+    elif filter_by == 'with_transcription_not_checked':
+        queryset = queryset.exclude(Q(transcription_text__isnull=True) | Q(transcription_text__exact=''))
+        queryset = queryset.filter(is_checked=False)
     elif filter_by == 'without_transcription':
         queryset = queryset.filter(Q(transcription_text__isnull=True) | Q(transcription_text__exact=''))
     
@@ -58,6 +62,7 @@ def main_view(request):
         'filter_by': filter_by,
         'speaker_filter': speaker_filter,
         'q': search_query,
+        'result_audios': queryset.count(),
         'stats': {
             'total': total_audios,
             'with_transcription': with_transcription_count,
@@ -107,9 +112,7 @@ def export_dataset_view(request):
     """
     View to generate and serve the dataset as a zip file using the correct CSV format.
     """
-    records = AudioTranscription.objects.select_related('speaker').exclude(
-        Q(transcription_text__isnull=True) | Q(transcription_text__exact='')
-    ).order_by('created_at')
+    records = AudioTranscription.objects.select_related('speaker').filter(is_checked=True).order_by('created_at')
     string_buffer = io.StringIO()
     
     csv_writer = csv.writer(string_buffer, delimiter='|', quoting=csv.QUOTE_MINIMAL)
@@ -149,6 +152,27 @@ def delete_audio_view(request):
         audio_transcription.delete()
 
         return JsonResponse({'status': 'success', 'message': 'Record deleted from database.'})
+    
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+@require_POST
+def finish_audio_view(request):
+    """
+    Marks a specific audio transcription as checked/finished.
+    """
+    try:
+        data = json.loads(request.body)
+        audio_id = data.get('audio_id')
+        transcription = data.get('transcription')
+        
+        audio_transcription = get_object_or_404(AudioTranscription, pk=audio_id)
+        audio_transcription.is_checked = True
+        audio_transcription.transcription_text = transcription
+        audio_transcription.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Audio marked as finished.'})
     
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

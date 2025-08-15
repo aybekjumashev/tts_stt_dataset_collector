@@ -107,9 +107,11 @@
         <form method="get" action="{% url 'main_view' %}" class="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row items-center gap-4 mb-8">
             <select name="filter_by" onchange="this.form.submit()" class="px-4 py-2 w-full sm:w-auto bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
                 <option value="all" {% if filter_by == 'all' %}selected{% endif %}>All Audios</option>
-                <option value="with_transcription" {% if filter_by == 'with_transcription' %}selected{% endif %}>With Transcription</option>
+                <option value="with_transcription_all" {% if filter_by == 'with_transcription_all' %}selected{% endif %}>With Transcription (All)</option>
+                <option value="with_transcription_checked" {% if filter_by == 'with_transcription_checked' %}selected{% endif %}>With Transcription (Checked)</option>
+                <option value="with_transcription_not_checked" {% if filter_by == 'with_transcription_not_checked' %}selected{% endif %}>With Transcription (Not Checked)</option>
                 <option value="without_transcription" {% if filter_by == 'without_transcription' %}selected{% endif %}>Without Transcription</option>
-            </select>            
+            </select>           
             <select name="speaker" onchange="this.form.submit()" class="px-4 py-2 w-full sm:w-auto bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
                 <option value="all">All Speakers</option>
                 {% for speaker in speakers %}
@@ -135,19 +137,41 @@
                 </thead>
                 <tbody>
                     {% for audio in page_obj %}
-                    <tr class="border-b border-gray-700 hover:bg-gray-600/50" data-audio-id="{{ audio.id }}">
+                    <tr class="border-b border-gray-700 hover:bg-gray-600/50 {% if audio.is_checked %}opacity-60{% endif %}" data-audio-id="{{ audio.id }}">
                         <td class="px-6 py-4">
                             <div class="font-mono text-white mb-2">{{ audio.file_name }}</div>
                             <audio controls src="{{ audio.audio_file.url }}" class="w-full"></audio>
                         </td>
                         <td class="px-6 py-4 text-gray-300">{{ audio.speaker.name }}</td>
                         <td class="px-6 py-4">
-                            <textarea class="transcription-input w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white" rows="3">{{ audio.transcription_text|default_if_none:"" }}</textarea>
+                            <textarea class="transcription-input w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white" rows="3" {% if audio.is_checked %}readonly{% endif %}>{{ audio.transcription_text|default_if_none:"" }}</textarea>
                         </td>
                         <td class="px-6 py-4">
-                            <div class="flex gap-2 flex-col">
-                                <button class="save-btn px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-md disabled:bg-gray-600 disabled:text-gray-400" disabled>Save</button>
-                                <button class="delete-btn px-4 py-2 text-xs font-medium text-white bg-red-600 rounded-md">Delete</button>
+                            <div class="flex gap-2">
+                                <button class="ai-btn p-2 text-xs font-medium text-white bg-yellow-500 rounded-md hover:bg-yellow-600 disabled:bg-gray-400" {% if audio.is_checked %}disabled{% endif %}>
+                                    <svg width="1rem" height="1rem" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                                        <path class="fill-white" d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
+                                    </svg>
+                                </button>
+                                <button class="save-btn p-2 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 disabled:bg-gray-400" disabled>
+                                    <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path class="stroke-current" d="M4 12L8.94975 16.9497L19.5572 6.34326" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="finish-btn p-2 text-xs font-medium text-white bg-green-500 rounded-md hover:bg-green-600 disabled:bg-gray-400" {% if not audio.transcription_text or audio.is_checked %}disabled{% endif %}>
+                                    <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path class="stroke-current" d="M7 12L11.9497 16.9497L22.5572 6.34326M2.0498 12.0503L6.99955 17M17.606 6.39355L12.3027 11.6969" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="delete-btn p-2 text-xs font-medium text-white bg-red-500 rounded-md hover:bg-red-600 disabled:bg-gray-400" {% if audio.is_checked %}disabled{% endif %}>
+                                    <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path class="stroke-current" d="M10 12V17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path class="stroke-current" d="M14 12V17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path class="stroke-current" d="M4 7H20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path class="stroke-current" d="M6 10V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18V10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path class="stroke-current" d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -159,21 +183,27 @@
         </div>
 
         <!-- Sahifalash (Pagination) -->
-        {% if page_obj.has_other_pages %}
-        <nav class="flex justify-center mt-8">
-            <ul class="flex items-center -space-x-px h-10 text-base">
-                {% if page_obj.has_previous %}
-                    <li><a href="?page=1&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-s-lg hover:bg-gray-700 hover:text-white">&laquo;</a></li>
-                    <li><a href="?page={{ page_obj.previous_page_number }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">Prev</a></li>
-                {% endif %}
-                <li><span class="flex items-center justify-center px-4 h-10 text-blue-400 border border-gray-700 bg-gray-700">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
-                {% if page_obj.has_next %}
-                    <li><a href="?page={{ page_obj.next_page_number }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">Next</a></li>
-                    <li><a href="?page={{ page_obj.paginator.num_pages }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-e-lg hover:bg-gray-700 hover:text-white">&raquo;</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
+        <div class="flex justify-between items-start mt-4 gap-4">
+            <!-- Ma'lumotlar miqdori haqida ma'lumot -->
+            <div class="flex items-center gap-2 text-sm ms-2">
+                <span class="text-gray-500">{{ result_audios }} Audio Files</span>
+            </div>
+            {% if page_obj.has_other_pages %}
+            <nav class="flex justify-center">
+                <ul class="flex items-center -space-x-px h-10 text-base">
+                    {% if page_obj.has_previous %}
+                        <li><a href="?page=1&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-s-lg hover:bg-gray-700 hover:text-white">1</a></li>
+                        <li><a href="?page={{ page_obj.previous_page_number }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">&lsaquo;</a></li>
+                    {% endif %}
+                        <li><span class="flex items-center justify-center px-4 h-10 text-blue-400 border border-gray-700 bg-gray-700">{{ page_obj.number }}</span></li>
+                    {% if page_obj.has_next %}
+                        <li><a href="?page={{ page_obj.next_page_number }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">&rsaquo;</a></li>
+                        <li><a href="?page={{ page_obj.paginator.num_pages }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-e-lg hover:bg-gray-700 hover:text-white">{{ page_obj.paginator.num_pages }}</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
     </div>
 
     <!-- MODAL OYNA (Spiker tanlash uchun) -->
@@ -210,8 +240,48 @@
         {% csrf_token %}
         <input type="file" id="file-input" name="audio_files" accept=".mp3" multiple>
     </form>
+    <script type="module">
+        import {
+            GoogleGenAI,
+            createUserContent,
+            createPartFromUri
+        } from "https://esm.sh/@google/genai";
+        const ai = new GoogleGenAI({
+            apiKey: "AIzaSyB0T2_THrBA1mf3pZVwHfGQcRWQ7k0bDn4"
+        });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.ai-btn').forEach(button => {
+                button.addEventListener('click', async function() {
+                    const row = this.closest('tr');
+                    const audioId = row.dataset.audioId;
+                    const audioSrc = row.querySelector('audio').src;
+                    const audioBlob = await  fetch(audioSrc).then(r => r.blob());
+                    const transcription = row.querySelector('.transcription-input');
+                    this.disabled = true;
+                    transcription.value = 'Processing...';
+
+                    const myfile = await ai.files.upload({
+                        file: audioBlob,
+                        config: { mimeType: "audio/wav" },
+                    });
+                    const result = await ai.models.generateContent({
+                        model: "gemini-2.5-pro",
+                        contents: createUserContent([
+                            createPartFromUri(myfile.uri, myfile.mimeType),
+                            "This is a Karakalpak audio. Create a transcription of the speech in the Karakalpak language and the Latin alphabet.",
+                        ]),
+                    });
+                    transcription.value = result.text;
+                    this.disabled = false;
+                    this.closest('tr').querySelector('.save-btn').disabled = false;
+                    this.closest('tr').querySelector('.finish-btn').disabled = false;
+                })
+            });
+        });
+    </script>
     <script>
+
         // JAVASCRIPT ENDI JUDA ODDIY VA FAQAT ASOSIY FUNKSIYALAR UCHUN QOLDI
         document.addEventListener('DOMContentLoaded', function() {
             // --- Fayl yuklash logikasi ---
@@ -223,6 +293,7 @@
             document.querySelectorAll('.transcription-input').forEach(textarea => {
                 textarea.addEventListener('input', function() {
                     this.closest('tr').querySelector('.save-btn').disabled = false;
+                    this.closest('tr').querySelector('.finish-btn').disabled = false;
                 });
             });
             document.querySelectorAll('.save-btn').forEach(button => {
@@ -312,6 +383,48 @@
                     alert('Please select a speaker before uploading.');
                 }
             });
+
+            document.querySelectorAll('.finish-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to mark this audio as finished? This action cannot be undone.')) {
+                        const row = this.closest('tr');
+                        const audioId = row.dataset.audioId;
+                        const audioTranscript = row.querySelector('.transcription-input').value;
+
+                        if (!audioTranscript || audioTranscript.trim() === '') {
+                            alert('Please enter a transcription before marking this audio as finished.');
+                            return;
+                        }
+
+
+
+                        fetch("{% url 'finish_audio' %}", {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                            body: JSON.stringify({ audio_id: audioId, transcription: audioTranscript })
+                        })
+                        .then(res => res.ok ? res.json() : Promise.reject(res))
+                        .then(data => {
+                            if (data.status === 'success') {
+                                row.classList.add('opacity-60');
+                                row.querySelector('.transcription-input').readOnly = true;
+                                row.querySelector('.save-btn').disabled = true;
+                                row.querySelector('.finish-btn').disabled = true;
+                                row.querySelector('.delete-btn').disabled = true;
+                                row.querySelector('.ai-btn').disabled = true;
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Finish Error:', err);
+                            alert('An unexpected error occurred.');
+                        });
+                    }
+                });
+            });
+
+
         });
     </script>
 </body>

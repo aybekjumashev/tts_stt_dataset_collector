@@ -21,6 +21,7 @@ class AudioTranscription(models.Model):
     transcription_text = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     speaker = models.ForeignKey(Speaker, on_delete=models.PROTECT, related_name='audios')
+    is_checked = models.BooleanField(default=False)
 
     def __str__(self):
         # Return the file name for a more readable representation in the admin panel
