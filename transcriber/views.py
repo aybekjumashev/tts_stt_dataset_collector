@@ -1,7 +1,7 @@
 # transcriber/views.py
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import AudioTranscription
+from .models import AudioTranscription, Speaker
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponse
 import json
@@ -11,6 +11,10 @@ import csv
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from .utils import split_audio
+import threading
+
+
 
 @login_required
 def main_view(request):
@@ -21,17 +25,28 @@ def main_view(request):
     with_transcription_count = AudioTranscription.objects.exclude(Q(transcription_text__isnull=True) | Q(transcription_text__exact='')).count()
     without_transcription_count = total_audios - with_transcription_count
 
-    queryset = AudioTranscription.objects.all().order_by('created_at')
+    queryset = AudioTranscription.objects.all().order_by('-created_at')
+    speakers = Speaker.objects.all()
 
     filter_by = request.GET.get('filter_by', 'all')
     if filter_by == 'with_transcription':
         queryset = queryset.exclude(Q(transcription_text__isnull=True) | Q(transcription_text__exact=''))
     elif filter_by == 'without_transcription':
         queryset = queryset.filter(Q(transcription_text__isnull=True) | Q(transcription_text__exact=''))
+    
+    
+    speaker_filter = request.GET.get('speaker', 'all')
+    if speaker_filter != 'all' and speaker_filter.isdigit():
+        queryset = queryset.filter(speaker__id=speaker_filter)
 
     search_query = request.GET.get('q', '')
     if search_query:
-        queryset = queryset.filter(transcription_text__icontains=search_query)
+        queryset = queryset.filter(
+            Q(transcription_text__icontains=search_query) |
+            Q(audio_file__icontains=search_query) |
+            Q(speaker__name__icontains=search_query) |
+            Q(speaker__code__icontains=search_query)
+        )
 
     paginator = Paginator(queryset, 10)
     page_number = request.GET.get('page')
@@ -39,7 +54,9 @@ def main_view(request):
 
     context = {
         'page_obj': page_obj,
+        'speakers': speakers,
         'filter_by': filter_by,
+        'speaker_filter': speaker_filter,
         'q': search_query,
         'stats': {
             'total': total_audios,
@@ -51,17 +68,19 @@ def main_view(request):
 
 
 
-@require_POST 
+@require_POST
 def upload_audio_view(request):
-    """
-    View to handle the upload of multiple .wav files.
-    """
     uploaded_files = request.FILES.getlist('audio_files')
-    
+    speaker_id = request.POST.get('speaker')
+    if not speaker_id:
+        return redirect('main_view')
+
+    speaker = get_object_or_404(Speaker, pk=speaker_id)
+
     for file in uploaded_files:
-        if file.name.endswith('.wav'):
-            AudioTranscription.objects.create(audio_file=file)
-            
+        for chunk_file in split_audio(file):
+            AudioTranscription.objects.create(audio_file=chunk_file, speaker=speaker)
+
     return redirect('main_view')
 
 
@@ -88,16 +107,16 @@ def export_dataset_view(request):
     """
     View to generate and serve the dataset as a zip file using the correct CSV format.
     """
-    records = AudioTranscription.objects.exclude(
+    records = AudioTranscription.objects.select_related('speaker').exclude(
         Q(transcription_text__isnull=True) | Q(transcription_text__exact='')
     ).order_by('created_at')
     string_buffer = io.StringIO()
     
-    csv_writer = csv.writer(string_buffer, quoting=csv.QUOTE_MINIMAL)
+    csv_writer = csv.writer(string_buffer, delimiter='|', quoting=csv.QUOTE_MINIMAL)
 
     for record in records:
         transcription = record.transcription_text or ''
-        csv_writer.writerow([record.file_name, transcription])
+        csv_writer.writerow([record.file_name, transcription, record.speaker.code])
 
     zip_buffer = io.BytesIO()
 
