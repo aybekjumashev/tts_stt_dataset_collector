@@ -140,7 +140,7 @@
                         <td class="px-6 py-4">
                             <div class="font-mono text-white mb-2">
                                 <div>{{ audio.file_name }}</div>
-                                <div class="small">{{ audio.speaker.name }}</div>
+                                <div class="text-xs text-gray-400">{{ audio.speaker.name }}</div>
                             </div>
                             <audio controls src="{{ audio.audio_file.url }}" class="w-full"></audio>
                         </td>
