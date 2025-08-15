@@ -15,7 +15,7 @@ def split_audio(uploaded_file):
 
     for index, chunk in enumerate(chunks, start=1):
         duration_sec = len(chunk) / 1000
-        if 5 <= duration_sec <= 15:
+        if 5 <= duration_sec <= 25:
             tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
             chunk.export(tmp_file.name, format="wav")
             yield File(open(tmp_file.name, "rb"), name=f"{file_name}_{index:04d}.wav")
