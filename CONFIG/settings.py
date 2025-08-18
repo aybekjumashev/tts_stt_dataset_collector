@@ -135,5 +135,5 @@ LOGOUT_REDIRECT_URL = 'login'
 
 
 CRONJOBS = [
-    ('*/15 * * * *', 'transcriber.crons.generate_text_last_audio'),
+    ('*/15 * * * *', 'transcriber.crons.generate_text_last_audio', '>> /tmp/cron.log 2>&1'),
 ]
