@@ -2,6 +2,7 @@ from pydub import AudioSegment, silence
 import tempfile
 from django.core.files import File
 
+
 def split_audio(uploaded_file):
     audio = AudioSegment.from_file(uploaded_file, format="mp3")
     file_name = uploaded_file.name.split('.')[0]
