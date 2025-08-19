@@ -2,6 +2,7 @@
 
 import os
 from django.db import models
+from mutagen.wave import WAVE
 
 class Speaker(models.Model):
     """
@@ -31,3 +32,10 @@ class AudioTranscription(models.Model):
     def file_name(self):
         # A property to easily get just the filename
         return os.path.basename(self.audio_file.name)
+    
+    @property
+    def duration_seconds(self):
+        if not self.audio_file:
+            return None
+        audio = WAVE(self.audio_file.path)
+        return int(audio.info.length)

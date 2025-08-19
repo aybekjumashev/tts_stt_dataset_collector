@@ -12,6 +12,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from .utils import split_audio
+import datetime
 
 
 
@@ -23,6 +24,11 @@ def main_view(request):
     total_audios = AudioTranscription.objects.count()
     with_transcription_count = AudioTranscription.objects.filter(is_checked=True).count()
     without_transcription_count = total_audios - with_transcription_count
+
+    time = 0
+    for audio in AudioTranscription.objects.all():
+        time += audio.duration_seconds
+
 
     queryset = AudioTranscription.objects.all().order_by('-created_at')
     speakers = Speaker.objects.all()
@@ -64,6 +70,7 @@ def main_view(request):
         'q': search_query,
         'result_audios': queryset.count(),
         'stats': {
+            'time': datetime.timedelta(seconds=time),
             'total': total_audios,
             'with_transcription': with_transcription_count,
             'without_transcription': without_transcription_count,
