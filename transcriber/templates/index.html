@@ -78,21 +78,26 @@
             {% csrf_token %}
         </form>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-gray-800 p-6 rounded-lg shadow-md text-center">
-                <div class="text-4xl font-extrabold text-yellow-400">{{ stats.time }}</div>
-                <div class="text-sm font-medium text-gray-400 uppercase tracking-wider mt-2">Time Audios</div>
-            </div>
-            <div class="bg-gray-800 p-6 rounded-lg shadow-md text-center">
-                <div class="text-4xl font-extrabold text-blue-400">{{ stats.total }}</div>
+                <div class="flex items-end justify-center gap-2">
+                    <span class="text-4xl font-extrabold text-blue-400">{{ stats.total }}</span>
+                    <span class="font-medium text-blue-400">[{{ stats.total_time }}]</span>
+                </div>
                 <div class="text-sm font-medium text-gray-400 uppercase tracking-wider mt-2">Total Audios</div>
             </div>
             <div class="bg-gray-800 p-6 rounded-lg shadow-md text-center">
-                <div class="text-4xl font-extrabold text-green-400">{{ stats.with_transcription }}</div>
+                <div class="flex items-end justify-center gap-2">
+                    <span class="text-4xl font-extrabold text-green-400">{{ stats.with_transcription }}</span>
+                    <span class="font-medium text-green-400">[{{ stats.with_transcription_time }}]</span>
+                </div>
                 <div class="text-sm font-medium text-gray-400 uppercase tracking-wider mt-2">With Transcription</div>
             </div>
             <div class="bg-gray-800 p-6 rounded-lg shadow-md text-center">
-                <div class="text-4xl font-extrabold text-red-400">{{ stats.without_transcription }}</div>
+                <div class="flex items-end justify-center gap-2">
+                    <span class="text-4xl font-extrabold text-red-400">{{ stats.without_transcription }}</span>
+                    <span class="font-medium text-red-400">[{{ stats.without_transcription_time }}]</span>
+                </div>
                 <div class="text-sm font-medium text-gray-400 uppercase tracking-wider mt-2">Without Transcription</div>
             </div>
         </div>

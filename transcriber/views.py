@@ -25,9 +25,16 @@ def main_view(request):
     with_transcription_count = AudioTranscription.objects.filter(is_checked=True).count()
     without_transcription_count = total_audios - with_transcription_count
 
-    time = 0
+    total_time = 0
     for audio in AudioTranscription.objects.all():
-        time += audio.duration_seconds
+        total_time += audio.duration_seconds
+    
+    with_transcription_time = 0
+    for audio in AudioTranscription.objects.filter(is_checked=True):
+        with_transcription_time += audio.duration_seconds
+
+    without_transcription_time = total_time - with_transcription_time
+
 
 
     queryset = AudioTranscription.objects.all().order_by('-created_at')
@@ -70,10 +77,12 @@ def main_view(request):
         'q': search_query,
         'result_audios': queryset.count(),
         'stats': {
-            'time': datetime.timedelta(seconds=time),
             'total': total_audios,
+            'total_time': datetime.timedelta(seconds=total_time),
             'with_transcription': with_transcription_count,
+            'with_transcription_time': datetime.timedelta(seconds=with_transcription_time),
             'without_transcription': without_transcription_count,
+            'without_transcription_time': datetime.timedelta(seconds=without_transcription_time),
         }
     }
     return render(request, 'index.html', context)
