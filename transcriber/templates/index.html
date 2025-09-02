@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +13,7 @@
         audio {
             filter: invert(1) hue-rotate(180deg);
         }
-
-        /* From Uiverse.io by aryamitra06 */
+        /* From Uiverse.io by aryamitra06 */ 
         .loader {
             display: flex;
             align-items: center;
@@ -52,12 +50,11 @@
         }
     </style>
 </head>
-
 <body class="bg-gray-900 text-gray-300 antialiased">
     <!-- Loader Overlay -->
     <div id="loader" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
         <!-- Spinner -->
-        <div class="loader">
+         <div class="loader">
             <span class="bar"></span>
             <span class="bar"></span>
             <span class="bar"></span>
@@ -72,8 +69,8 @@
 
         <div class="absolute top-4 right-6 text-sm text-gray-400">
             {% if user.is_authenticated %}
-            <span>Welcome, <strong class="text-white">{{ user.username }}</strong></span>
-            <a href="#" id="logout-link" class="text-blue-400 hover:text-blue-300">Logout</a>
+                <span>Welcome, <strong class="text-white">{{ user.username }}</strong></span>
+                <a href="#" id="logout-link" class="text-blue-400 hover:text-blue-300">Logout</a>
             {% endif %}
         </div>
 
@@ -107,45 +104,33 @@
 
         <!-- Boshqaruv Tugmalari -->
         <div class="flex justify-center gap-4 mb-8">
-            <button id="upload-btn"
-                class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors">
+            <button id="upload-btn" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors">
                 Upload Audio
             </button>
-            <a href="{% url 'export_dataset' %}"
-                class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 transition-colors">
+            <a href="{% url 'export_dataset' %}" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 transition-colors">
                 Export Dataset
             </a>
         </div>
 
         <!-- Filter va Qidiruv Formasi -->
-        <form method="get" action="{% url 'main_view' %}"
-            class="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row items-center gap-4 mb-8">
-            <select name="filter_by" onchange="this.form.submit()"
-                class="px-4 py-2 w-full sm:w-auto bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <option value="all" {% if filter_by=='all' %}selected{% endif %}>All Audios</option>
-                <option value="with_transcription_all" {% if filter_by=='with_transcription_all' %}selected{% endif %}>
-                    With Transcription (All)</option>
-                <option value="with_transcription_checked" {% if filter_by=='with_transcription_checked' %}selected{%
-                    endif %}>With Transcription (Checked)</option>
-                <option value="with_transcription_not_checked" {% if filter_by=='with_transcription_not_checked'
-                    %}selected{% endif %}>With Transcription (Not Checked)</option>
-                <option value="without_transcription" {% if filter_by=='without_transcription' %}selected{% endif %}>
-                    Without Transcription</option>
-            </select>
-            <select name="speaker" onchange="this.form.submit()"
-                class="px-4 py-2 w-full sm:w-auto bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
+        <form method="get" action="{% url 'main_view' %}" class="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row items-center gap-4 mb-8">
+            <select name="filter_by" onchange="this.form.submit()" class="px-4 py-2 w-full sm:w-auto bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <option value="all" {% if filter_by == 'all' %}selected{% endif %}>All Audios</option>
+                <option value="with_transcription_all" {% if filter_by == 'with_transcription_all' %}selected{% endif %}>With Transcription (All)</option>
+                <option value="with_transcription_checked" {% if filter_by == 'with_transcription_checked' %}selected{% endif %}>With Transcription (Checked)</option>
+                <option value="with_transcription_not_checked" {% if filter_by == 'with_transcription_not_checked' %}selected{% endif %}>With Transcription (Not Checked)</option>
+                <option value="without_transcription" {% if filter_by == 'without_transcription' %}selected{% endif %}>Without Transcription</option>
+            </select>           
+            <select name="speaker" onchange="this.form.submit()" class="px-4 py-2 w-full sm:w-auto bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
                 <option value="all">All Speakers</option>
                 {% for speaker in speakers %}
-                <option value="{{ speaker.id }}" {% if speaker_filter==speaker.id|stringformat:"s" %}selected{% endif
-                    %}>
-                    {{ speaker.name }}
-                </option>
+                    <option value="{{ speaker.id }}" {% if speaker_filter == speaker.id|stringformat:"s" %}selected{% endif %}>
+                        {{ speaker.name }}
+                    </option>
                 {% endfor %}
             </select>
-            <input type="text" name="q" placeholder="Search in transcription..." value="{{ q }}"
-                class="px-4 py-2 flex-grow w-full bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
-            <button type="submit"
-                class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors">Apply</button>
+            <input type="text" name="q" placeholder="Search in transcription..." value="{{ q }}" class="px-4 py-2 flex-grow w-full bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors">Apply</button>
         </form>
 
         <!-- Asosiy Jadval -->
@@ -160,80 +145,51 @@
                 </thead>
                 <tbody>
                     {% for audio in page_obj %}
-                    <tr class="border-b border-gray-700 hover:bg-gray-600/50 {% if audio.is_checked %}opacity-60{% endif %}"
-                        data-audio-id="{{ audio.id }}">
+                    <tr class="border-b border-gray-700 hover:bg-gray-600/50 {% if audio.is_checked %}opacity-60{% endif %}" data-audio-id="{{ audio.id }}">
                         <td class="px-6">
                             <audio controls src="{{ audio.audio_file.url }}" class="w-full"></audio>
                             <div class="font-mono text-white mt-2 text-center">
-                                <div>{{ audio.file_name }}</div>
+                                <div>{{ audio.file_name }}</div> 
                                 <div class="text-xs text-gray-400">{{ audio.speaker.name }}</div>
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <textarea
-                                class="transcription-input w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-                                rows="5" {% if audio.is_checked %}readonly{% endif
-                                %}>{{ audio.transcription_text|default_if_none:"" }}</textarea>
+                            <textarea class="transcription-input w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white" rows="5" {% if audio.is_checked %}readonly{% endif %}>{{ audio.transcription_text|default_if_none:"" }}</textarea>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex gap-2">
-                                <button
-                                    class="ai-btn p-2 text-xs font-medium text-white bg-yellow-500 rounded-md hover:bg-yellow-600 disabled:bg-gray-400"
-                                    {% if audio.is_checked %}disabled{% endif %}>
-                                    <svg width="1rem" height="1rem" viewBox="0 0 16 16"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path class="fill-white"
-                                            d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z" />
+                                <button class="ai-btn p-2 text-xs font-medium text-white bg-yellow-500 rounded-md hover:bg-yellow-600 disabled:bg-gray-400" {% if audio.is_checked %}disabled{% endif %}>
+                                    <svg width="1rem" height="1rem" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                                        <path class="fill-white" d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
                                     </svg>
                                 </button>
-                                <button
-                                    class="save-btn p-2 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
-                                    disabled>
-                                    <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path class="stroke-current" d="M4 12L8.94975 16.9497L19.5572 6.34326"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <button class="save-btn p-2 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 disabled:bg-gray-400" disabled>
+                                    <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path class="stroke-current" d="M4 12L8.94975 16.9497L19.5572 6.34326" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
-
+                                
                                 {% if request.user.is_staff %}
-                                <button
-                                    class="finish-btn p-2 text-xs font-medium text-white bg-green-500 rounded-md hover:bg-green-600 disabled:bg-gray-400"
-                                    {% if not audio.transcription_text or audio.is_checked %}disabled{% endif %}>
-                                    <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path class="stroke-current"
-                                            d="M7 12L11.9497 16.9497L22.5572 6.34326M2.0498 12.0503L6.99955 17M17.606 6.39355L12.3027 11.6969"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <button class="finish-btn p-2 text-xs font-medium text-white bg-green-500 rounded-md hover:bg-green-600 disabled:bg-gray-400" {% if not audio.transcription_text or audio.is_checked %}disabled{% endif %}>
+                                    <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path class="stroke-current" d="M7 12L11.9497 16.9497L22.5572 6.34326M2.0498 12.0503L6.99955 17M17.606 6.39355L12.3027 11.6969" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
                                 {% endif %}
-                                <button
-                                    class="delete-btn p-2 text-xs font-medium text-white bg-red-500 rounded-md hover:bg-red-600 disabled:bg-gray-400"
-                                    {% if audio.is_checked %}disabled{% endif %}>
-                                    <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path class="stroke-current" d="M10 12V17" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" />
-                                        <path class="stroke-current" d="M14 12V17" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" />
-                                        <path class="stroke-current" d="M4 7H20" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path class="stroke-current"
-                                            d="M6 10V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18V10"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        <path class="stroke-current"
-                                            d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <button class="delete-btn p-2 text-xs font-medium text-white bg-red-500 rounded-md hover:bg-red-600 disabled:bg-gray-400" {% if audio.is_checked %}disabled{% endif %}>
+                                    <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path class="stroke-current" d="M10 12V17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path class="stroke-current" d="M14 12V17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path class="stroke-current" d="M4 7H20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path class="stroke-current" d="M6 10V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18V10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path class="stroke-current" d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center py-12 text-gray-500">No audio files found.</td>
-                    </tr>
+                    <tr><td colspan="4" class="text-center py-12 text-gray-500">No audio files found.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -249,23 +205,13 @@
             <nav class="flex justify-center">
                 <ul class="flex items-center -space-x-px h-10 text-base">
                     {% if page_obj.has_previous %}
-                    <li><a href="?page=1&filter_by={{ filter_by }}&q={{ q }}"
-                            class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-s-lg hover:bg-gray-700 hover:text-white">1</a>
-                    </li>
-                    <li><a href="?page={{ page_obj.previous_page_number }}&filter_by={{ filter_by }}&q={{ q }}"
-                            class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">&lsaquo;</a>
-                    </li>
+                        <li><a href="?page=1&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-s-lg hover:bg-gray-700 hover:text-white">1</a></li>
+                        <li><a href="?page={{ page_obj.previous_page_number }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">&lsaquo;</a></li>
                     {% endif %}
-                    <li><span
-                            class="flex items-center justify-center px-4 h-10 text-blue-400 border border-gray-700 bg-gray-700">{{
-                            page_obj.number }}</span></li>
+                        <li><span class="flex items-center justify-center px-4 h-10 text-blue-400 border border-gray-700 bg-gray-700">{{ page_obj.number }}</span></li>
                     {% if page_obj.has_next %}
-                    <li><a href="?page={{ page_obj.next_page_number }}&filter_by={{ filter_by }}&q={{ q }}"
-                            class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">&rsaquo;</a>
-                    </li>
-                    <li><a href="?page={{ page_obj.paginator.num_pages }}&filter_by={{ filter_by }}&q={{ q }}"
-                            class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-e-lg hover:bg-gray-700 hover:text-white">{{
-                            page_obj.paginator.num_pages }}</a></li>
+                        <li><a href="?page={{ page_obj.next_page_number }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:text-white">&rsaquo;</a></li>
+                        <li><a href="?page={{ page_obj.paginator.num_pages }}&filter_by={{ filter_by }}&q={{ q }}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-400 bg-gray-800 border border-gray-700 rounded-e-lg hover:bg-gray-700 hover:text-white">{{ page_obj.paginator.num_pages }}</a></li>
                     {% endif %}
                 </ul>
             </nav>
@@ -277,39 +223,33 @@
     <div id="speaker-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md">
             <h2 class="text-2xl font-bold text-white mb-6">Select Speaker for Upload</h2>
-
+            
             <!-- Yuklash formasi endi modal ichida -->
             <form id="upload-form" action="{% url 'upload_audio' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="mb-6">
                     <label for="speaker-select" class="block mb-2 text-sm font-medium text-gray-300">Speaker</label>
-                    <select id="speaker-select" name="speaker"
-                        class="w-full p-2.5 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                        required>
+                    <select id="speaker-select" name="speaker" class="w-full p-2.5 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
                         <option value="" disabled selected>-- Choose a speaker --</option>
                         {% for speaker in speakers %}
                         <option value="{{ speaker.id }}">{{ speaker.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-
+                
                 <!-- Fayl inputi yashirin, lekin forma ichida qoladi -->
                 <input type="file" id="file-input" name="audio_files" accept=".mp3" multiple class="hidden">
 
                 <div class="flex justify-end gap-4">
-                    <button type="button" id="cancel-upload-btn"
-                        class="px-6 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-500 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">Cancel</button>
-                    <button type="submit" id="confirm-upload-btn"
-                        class="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">Confirm
-                        & Upload</button>
+                    <button type="button" id="cancel-upload-btn" class="px-6 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-500 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">Cancel</button>
+                    <button type="submit" id="confirm-upload-btn" class="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">Confirm & Upload</button>
                 </div>
             </form>
         </div>
     </div>
-
+    
     <!-- Yashirin yuklash formasi -->
-    <form id="upload-form" action="{% url 'upload_audio' %}" method="post" enctype="multipart/form-data"
-        style="display: none;">
+    <form id="upload-form" action="{% url 'upload_audio' %}" method="post" enctype="multipart/form-data" style="display: none;">
         {% csrf_token %}
         <input type="file" id="file-input" name="audio_files" accept=".mp3" multiple>
     </form>
@@ -323,13 +263,13 @@
             apiKey: "AIzaSyB0T2_THrBA1mf3pZVwHfGQcRWQ7k0bDn4"
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.ai-btn').forEach(button => {
-                button.addEventListener('click', async function () {
+                button.addEventListener('click', async function() {
                     const row = this.closest('tr');
                     const audioId = row.dataset.audioId;
                     const audioSrc = row.querySelector('audio').src;
-                    const audioBlob = await fetch(audioSrc).then(r => r.blob());
+                    const audioBlob = await  fetch(audioSrc).then(r => r.blob());
                     const transcription = row.querySelector('.transcription-input');
                     this.disabled = true;
                     transcription.value = 'Processing...';
@@ -356,7 +296,7 @@
     <script>
 
         // JAVASCRIPT ENDI JUDA ODDIY VA FAQAT ASOSIY FUNKSIYALAR UCHUN QOLDI
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // --- Fayl yuklash logikasi ---
             const uploadBtn = document.getElementById('upload-btn');
             const fileInput = document.getElementById('file-input');
@@ -364,13 +304,13 @@
 
             // --- "Save" tugmasi logikasi ---
             document.querySelectorAll('.transcription-input').forEach(textarea => {
-                textarea.addEventListener('input', function () {
+                textarea.addEventListener('input', function() {
                     this.closest('tr').querySelector('.save-btn').disabled = false;
                     this.closest('tr').querySelector('.finish-btn').disabled = false;
                 });
             });
             document.querySelectorAll('.save-btn').forEach(button => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     this.disabled = true;
                     fetch("{% url 'save_transcription' %}", {
                         method: 'POST',
@@ -380,18 +320,18 @@
                             transcription: this.closest('tr').querySelector('.transcription-input').value
                         })
                     })
-                        .then(res => { if (!res.ok) throw new Error('Server response was not ok.') })
-                        .catch(err => {
-                            console.error('Save Error:', err);
-                            alert('An error occurred while saving.');
-                            this.disabled = false;
-                        });
+                    .then(res => { if (!res.ok) throw new Error('Server response was not ok.') })
+                    .catch(err => {
+                        console.error('Save Error:', err);
+                        alert('An error occurred while saving.');
+                        this.disabled = false; 
+                    });
                 });
             });
 
             // --- "Delete" tugmasi logikasi ---
             document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     const row = this.closest('tr');
                     const fileName = row.querySelector('.font-mono').textContent.trim();
                     if (confirm(`Are you sure you want to delete "${fileName}"?`)) {
@@ -400,27 +340,27 @@
                             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
                             body: JSON.stringify({ audio_id: row.dataset.audioId })
                         })
-                            .then(res => res.ok ? res.json() : Promise.reject(res))
-                            .then(data => {
-                                if (data.status === 'success') {
-                                    window.location.reload(); // Statistika yangilanishi uchun to'liq yangilash
-                                } else {
-                                    alert('Error deleting file: ' + data.message);
-                                }
-                            })
-                            .catch(err => {
-                                console.error('Delete Error:', err);
-                                alert('An unexpected error occurred.');
-                            });
+                        .then(res => res.ok ? res.json() : Promise.reject(res))
+                        .then(data => {
+                            if (data.status === 'success') {
+                                window.location.reload(); // Statistika yangilanishi uchun to'liq yangilash
+                            } else {
+                                alert('Error deleting file: ' + data.message);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Delete Error:', err);
+                            alert('An unexpected error occurred.');
+                        });
                     }
                 });
             });
 
             const logoutLink = document.getElementById('logout-link');
             if (logoutLink) {
-                logoutLink.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    document.getElementById('logout-form').submit();
+                logoutLink.addEventListener('click', function(event) {
+                    event.preventDefault(); 
+                    document.getElementById('logout-form').submit(); 
                 });
             }
 
@@ -429,7 +369,7 @@
             const speakerModal = document.getElementById('speaker-modal');
             const cancelUploadBtn = document.getElementById('cancel-upload-btn');
             const speakerSelect = document.getElementById('speaker-select');
-
+            
             uploadBtn.addEventListener('click', () => {
                 fileInput.click();
             });
@@ -442,23 +382,23 @@
 
             cancelUploadBtn.addEventListener('click', () => {
                 speakerModal.classList.add('hidden');
-                fileInput.value = '';
-                speakerSelect.value = '';
+                fileInput.value = ''; 
+                speakerSelect.value = ''; 
             });
 
-            uploadForm.addEventListener('submit', function (event) {
-
+            uploadForm.addEventListener('submit', function(event) {
+                
                 document.getElementById('loader').classList.remove('hidden');
                 speakerModal.classList.add('hidden');
 
                 if (!speakerSelect.value) {
-                    event.preventDefault();
+                    event.preventDefault(); 
                     alert('Please select a speaker before uploading.');
                 }
             });
 
             document.querySelectorAll('.finish-btn').forEach(button => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     if (confirm('Are you sure you want to mark this audio as finished? This action cannot be undone.')) {
                         const row = this.closest('tr');
                         const audioId = row.dataset.audioId;
@@ -476,23 +416,23 @@
                             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
                             body: JSON.stringify({ audio_id: audioId, transcription: audioTranscript })
                         })
-                            .then(res => res.ok ? res.json() : Promise.reject(res))
-                            .then(data => {
-                                if (data.status === 'success') {
-                                    row.classList.add('opacity-60');
-                                    row.querySelector('.transcription-input').readOnly = true;
-                                    row.querySelector('.save-btn').disabled = true;
-                                    row.querySelector('.finish-btn').disabled = true;
-                                    row.querySelector('.delete-btn').disabled = true;
-                                    row.querySelector('.ai-btn').disabled = true;
-                                } else {
-                                    alert('Error: ' + data.message);
-                                }
-                            })
-                            .catch(err => {
-                                console.error('Finish Error:', err);
-                                alert('An unexpected error occurred.');
-                            });
+                        .then(res => res.ok ? res.json() : Promise.reject(res))
+                        .then(data => {
+                            if (data.status === 'success') {
+                                row.classList.add('opacity-60');
+                                row.querySelector('.transcription-input').readOnly = true;
+                                row.querySelector('.save-btn').disabled = true;
+                                row.querySelector('.finish-btn').disabled = true;
+                                row.querySelector('.delete-btn').disabled = true;
+                                row.querySelector('.ai-btn').disabled = true;
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Finish Error:', err);
+                            alert('An unexpected error occurred.');
+                        });
                     }
                 });
             });
@@ -501,5 +441,4 @@
         });
     </script>
 </body>
-
 </html>
