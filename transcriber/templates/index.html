@@ -107,7 +107,7 @@
             <button id="upload-btn" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors">
                 Upload Audio
             </button>
-            <a href="{% url 'export_dataset' %}" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 transition-colors">
+            <a href="{% if request.user.is_superuser %} {% url 'export_dataset' %} {% endif %}" id="export-btn" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 transition-colors">
                 Export Dataset
             </a>
         </div>
