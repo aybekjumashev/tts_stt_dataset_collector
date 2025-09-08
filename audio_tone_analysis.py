@@ -39,8 +39,8 @@ def calculate_clarity_score(audio_path):
 
 print("--- Determining Quality Threshold from Your Sample Files ---")
 
-clean_audio_path = os.path.join('media/test/', CLEAN_REFERENCE_FILE)
-poor_quality_audio_path = os.path.join('media/test/', POOR_QUALITY_REFERENCE_FILE)
+clean_audio_path = os.path.join('audios_for_analysis/', CLEAN_REFERENCE_FILE)
+poor_quality_audio_path = os.path.join('audios_for_analysis/', POOR_QUALITY_REFERENCE_FILE)
 
 clean_score = calculate_clarity_score(clean_audio_path)
 poor_score = calculate_clarity_score(poor_quality_audio_path)
